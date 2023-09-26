@@ -1,0 +1,46 @@
+version: "3"
+services:
+  # container do banco de dados mysql
+  db:
+    platform: linux/x86_64
+    image: mysql:5.7
+    # comandos de configuração do container
+    command:
+            --sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+            --max-allowed-packet=67108864
+    ports:
+      - "33066:3306"
+    volumes:
+    # para os dados do banco de dados serem persistidos
+    - /var/lib/mysql
+    # mapeamento de diretórios para popular o banco de dados quando o container é inicializado pela primeira vez
+    - ./database_dumps:/docker-entrypoint-initdb.d
+    # usuario e senha do banco de dados
+    environment:
+    - MYSQL_ROOT_PASSWORD=root
+    - MYSQL_DATABASE=blog
+  php:
+    build: ./
+    environment:
+    # Parametro para o Xdebug funcionar 
+      - XDEBUG_MODE=develop,debug 
+    # Parametro para o Xdebug funcionar          
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+    links:
+      - "db"
+  # container para administrar o banco de dados    
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    links:
+      - "db"
+    ports:
+      - "8002:80"
+    environment:
+      - PMA_HOST=db
+      - PMA_USER=root
+      - PMA_PASSWORD=root
