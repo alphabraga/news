@@ -5,8 +5,8 @@ namespace Deployer;
 require 'recipe/codeigniter.php';
 
 set('repository', 'git@github.com:alphabraga/news');
-
-host('www.thudertech.com.br')
+      
+host('www.thundertech.com.br')
 ->set('labels', ['stage' => 'testing'])
 ->set('remote_user', 'root')
 ->set('deploy_path', '/project/news');
